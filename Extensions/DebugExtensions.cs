@@ -8,12 +8,12 @@ public static class DebugExtensions
         Debug.LogFormat($"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{message}</color>");
     }
     
-    public static void Log<T>(this T target, Color color) where T : Object
+    public static void Log<T>(this T target, Color color)
     {
-        Debug.LogFormat(target, $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{target.ToString()}</color>");
+        Debug.LogFormat($"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{target}</color>");
     }
 
-    public static void Log<T>(this T target, string message, Color color) where T : Object
+    public static void LogTarget<T>(this T target, string message, Color color) where T : Object
     {
         Debug.LogFormat(target, $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{message}</color>");
     }
