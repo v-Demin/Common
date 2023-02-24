@@ -2,6 +2,15 @@ using UnityEngine;
 
 public static class DebugExtensions
 {
+
+    public static void LogBool(this string message)
+    {
+        message.LogBool(message.Contains("True"));
+    }
+    public static void LogBool(this string message, bool isTrue)
+    {
+        message.Log(isTrue ? Color.green : Color.red);
+    }
     
     public static void Log(this string message, Color color)
     {
