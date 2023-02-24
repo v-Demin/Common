@@ -23,4 +23,17 @@ public static class GenericExtensions
             }
         }
     }
+    
+    public static void ShiftLeft<T>(this List<T> list, int shifts)
+    {
+        for (int i = shifts; i < list.Count; i++)
+        {
+            list[i - shifts] = list[i];
+        }
+
+        for (int i = list.Count - shifts; i < list.Count; i++)
+        {
+            list[i] = default(T);
+        }
+    }
 }
