@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Submodules.Common.Collections
 {
@@ -23,6 +24,13 @@ namespace Submodules.Common.Collections
         {
             get => _innerDictionary[enumIndex];
             set => _innerDictionary[enumIndex] = value;
+        }
+
+        public override string ToString()
+        {
+            return _innerDictionary.ToList()
+                .Select(pair => $"{pair.Key.ToString()}: {pair.Value.ToString()}")
+                .Aggregate((cur, next) => $"{cur}, {next}");
         }
     }
 }
