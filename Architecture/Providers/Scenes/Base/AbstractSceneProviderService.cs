@@ -1,18 +1,19 @@
 using UnityEngine.SceneManagement;
 
-namespace Submodules.Common.Gameplays.Services.Providers
+namespace Submodules.Common.Architecture.Providers
 {
-    public abstract class AbstractSceneProviderService<T>
+    public abstract class AbstractSceneProviderService
     {
         protected abstract string SceneName { get;}
-        public T Data { get; protected set; }
     
-        public virtual void StartScene(T data)
+        public virtual void StartScene()
         {
-            Data = data;
+            PrepareService();
             LoadScene();
         }
 
+        protected abstract void PrepareService();
+        
         protected void LoadScene()
         {
             SceneManager.LoadScene(SceneName);
