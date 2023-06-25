@@ -2,6 +2,8 @@ namespace Submodules.Common.Architecture.Providers
 {
     public abstract class AbstractDataProvider
     {
-        public abstract void CollectData();
+        public virtual void CollectData()
+        {
+        }
     }
 }
