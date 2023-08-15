@@ -36,9 +36,7 @@ namespace Submodules.Common.Architecture.Providers
         {
             public Action Action { get; set; }
         
-            public RefAction(): this(default)
-            {
-            }
+            public RefAction(): this(default) { }
 
             public RefAction(Action action)
             {
