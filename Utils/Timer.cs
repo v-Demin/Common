@@ -35,12 +35,14 @@ namespace Submodules.Common.Utils
                     CurrentSeconds = value;
                     OnUpdate?.Invoke(this);
                 })
+                .SetEase(Ease.Linear)
                 .OnStart(() => OnStart?.Invoke(this))
                 .OnPause(() => OnPause?.Invoke(this))
                 .OnComplete(() => OnEnd?.Invoke(this));
 
             if (_isLooped)
             {
+                _cashedTimer.OnStepComplete(() => OnEnd?.Invoke(this));
                 _cashedTimer.SetLoops(-1);
             }
         }
