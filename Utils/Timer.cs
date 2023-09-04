@@ -15,6 +15,7 @@ namespace Submodules.Common.Utils
         public float AllSeconds { get; private set; }
         public float CurrentSeconds { get; private set; }
         public float LastedSeconds => AllSeconds - CurrentSeconds;
+        public float LastedProportion => CurrentSeconds / AllSeconds;
 
         
         private Tween _cashedTimer;
@@ -41,16 +42,6 @@ namespace Submodules.Common.Utils
         public void Pause()
         {
             _cashedTimer?.Pause();
-        }
-
-        private IEnumerator TimerRoutine()
-        {
-            while (LastedSeconds > 0)
-            {
-                CurrentSeconds += Time.deltaTime;
-
-                yield return null;
-            }
         }
     }
 }
