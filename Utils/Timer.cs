@@ -30,7 +30,11 @@ namespace Submodules.Common.Utils
         {
             AllSeconds = seconds;
             
-            _cashedTimer = DOVirtual.Float(CurrentSeconds, AllSeconds, AllSeconds, value => OnUpdate?.Invoke(this))
+            _cashedTimer = DOVirtual.Float(CurrentSeconds, AllSeconds, AllSeconds, value =>
+                {
+                    CurrentSeconds = value;
+                    OnUpdate?.Invoke(this);
+                })
                 .OnStart(() => OnStart?.Invoke(this))
                 .OnPause(() => OnPause?.Invoke(this))
                 .OnComplete(() => OnEnd?.Invoke(this));
