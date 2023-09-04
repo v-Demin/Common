@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using DG.Tweening;
-using UnityEngine;
 
 namespace Submodules.Common.Utils
 {
@@ -19,11 +17,13 @@ namespace Submodules.Common.Utils
 
         
         private Tween _cashedTimer;
-
-        public Timer()
+        private bool _isLooped = false;
+        
+        public Timer(bool isLooped)
         {
             AllSeconds = 0;
             CurrentSeconds = 0;
+            _isLooped = isLooped;
         }
 
         public void Start(float seconds)
@@ -34,6 +34,11 @@ namespace Submodules.Common.Utils
                 .OnStart(() => OnStart?.Invoke(this))
                 .OnPause(() => OnPause?.Invoke(this))
                 .OnComplete(() => OnEnd?.Invoke(this));
+
+            if (_isLooped)
+            {
+                _cashedTimer.SetLoops(-1);
+            }
         }
 
         public void Resume()
