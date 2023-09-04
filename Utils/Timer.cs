@@ -20,14 +20,16 @@ namespace Submodules.Common.Utils
         
         private Tween _cashedTimer;
 
-        public Timer(float seconds)
+        public Timer()
         {
-            AllSeconds = seconds;
+            AllSeconds = 0;
             CurrentSeconds = 0;
         }
 
-        public void Start()
+        public void Start(float seconds)
         {
+            AllSeconds = seconds;
+            
             _cashedTimer = DOVirtual.Float(CurrentSeconds, AllSeconds, AllSeconds, value => OnUpdate?.Invoke(this))
                 .OnStart(() => OnStart?.Invoke(this))
                 .OnPause(() => OnPause?.Invoke(this))
