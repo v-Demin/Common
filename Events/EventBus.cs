@@ -26,8 +26,6 @@ public class EventBus
     public void RaiseEvent<TSubscriber>(Action<TSubscriber> action)
         where TSubscriber : class, ISubscriber
     {
-        "я райзякаю".Log(Color.green);
-
         if(!_events.ContainsKey(typeof(TSubscriber))) return;
         
         var subscribers = _events[typeof(TSubscriber)];
