@@ -8,8 +8,6 @@ public class EventBus
 
     public void Subscribe<T>(T subscriber)
     {
-        $"Я субскрябакаю {typeof(T)}".Log(Color.cyan);
-        
         if (subscriber is not ISubscriber subscriberInner) return; 
         
         var subscriberTypes = EventBusHelper.GetSubscriberTypes(subscriberInner);
