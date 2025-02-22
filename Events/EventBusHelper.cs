@@ -7,9 +7,9 @@ internal static class EventBusHelper
     private static Dictionary<Type, List<Type>> s_CashedSubscriberTypes =
         new Dictionary<Type, List<Type>>();
 
-    public static List<Type> GetSubscriberTypes(ISubscriber globalSubscriber)
+    public static List<Type> GetSubscriberTypes(ISubscriber subscriber)
     {
-        var type = globalSubscriber.GetType();
+        var type = subscriber.GetType();
         if (s_CashedSubscriberTypes.TryGetValue(type, out var types))
         {
             return types;
@@ -17,8 +17,7 @@ internal static class EventBusHelper
 
         var subscriberTypes = type
             .GetInterfaces()
-            .Where(t => t.GetInterfaces()
-                .Contains(typeof(ISubscriber)))
+            .Where(t => typeof(ISubscriber).IsAssignableFrom(t))
             .ToList();
 
         s_CashedSubscriberTypes[type] = subscriberTypes;
