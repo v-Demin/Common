@@ -1,0 +1,7 @@
+#NAMESPACE_START#
+[System.Serializable]
+public class #SCRIPTNAME# : #PARENTNAME#
+{
+    
+}
+#NAMESPACE_END#
