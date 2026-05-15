@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace MyProject.Editor
+namespace Submodules.Common.Tools.SubclassSelector
 {
     [CustomPropertyDrawer(typeof(SubClassSelectorAttribute))]
     public class SubClassSelectorDrawer : PropertyDrawer
@@ -16,6 +15,15 @@ namespace MyProject.Editor
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            // ПРЕДОХРАНИТЕЛЬ: Если проект компилируется, просто рисуем заглушку.
+            // Это не даст инспектору Unity лезть в нативные типы твоего asmdef во время пересборки
+            // и полностью предотвратит появление ошибки "invalid GC handle".
+            if (EditorApplication.isCompiling)
+            {
+                EditorGUI.LabelField(position, label.text, "Compiling asmdef...");
+                return;
+            }
+
             if (property.propertyType != SerializedPropertyType.ManagedReference)
             {
                 EditorGUI.LabelField(position, label.text, "Use [SubClassSelector] only with [SerializeReference]");
@@ -43,8 +51,15 @@ namespace MyProject.Editor
                 var state = new AdvancedDropdownState();
                 var dropdown = new SubClassTypeDropdown(state, types, baseType.Name, (selectedType) =>
                 {
+                    // Важно: меняем значение через Undo, чтобы Unity корректно регистрировала изменения в нативной части
+                    Undo.RecordObject(property.serializedObject.targetObject, "Change SubClass Type");
+                    
                     property.managedReferenceValue = selectedType == null ? null : Activator.CreateInstance(selectedType);
                     property.serializedObject.ApplyModifiedProperties();
+                    
+                    // Насильно маркируем объект грязным и сохраняем, чтобы кэш памяти не затерся при компиляции
+                    EditorUtility.SetDirty(property.serializedObject.targetObject);
+                    AssetDatabase.SaveAssets();
                 });
                 
                 dropdown.Show(typeBtnRect);
@@ -68,7 +83,16 @@ namespace MyProject.Editor
                 menu.ShowAsContext();
             }
 
+            // Стандартная отрисовка полей самого класса
             EditorGUI.PropertyField(position, property, GUIContent.none, true);
+        }
+
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) 
+        {
+            if (EditorApplication.isCompiling)
+                return EditorGUIUtility.singleLineHeight;
+                
+            return EditorGUI.GetPropertyHeight(property, label, true);
         }
 
         private void PingScriptAsset(string managedReferenceFullTypename)
@@ -91,9 +115,6 @@ namespace MyProject.Editor
             }
         }
 
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) 
-            => EditorGUI.GetPropertyHeight(property, label, true);
-
         private void AddModeOption(GenericMenu menu, string name, int mode)
         {
             menu.AddItem(new GUIContent(name), EditorPrefs.GetInt(ModePrefKey, 0) == mode, () => EditorPrefs.SetInt(ModePrefKey, mode));
@@ -110,82 +131,6 @@ namespace MyProject.Editor
                 if (field != null) type = field.FieldType;
             }
             return type;
-        }
-    }
-
-    public class SubClassTypeDropdown : AdvancedDropdown
-    {
-        private readonly IEnumerable<Type> _types;
-        private readonly Action<Type> _onSelected;
-        private readonly string _title;
-
-        public SubClassTypeDropdown(AdvancedDropdownState state, IEnumerable<Type> types, string title, Action<Type> onSelected) : base(state)
-        {
-            _types = types; _onSelected = onSelected; _title = title;
-            minimumSize = new Vector2(300, 400);
-        }
-
-        protected override AdvancedDropdownItem BuildRoot()
-        {
-            var root = new AdvancedDropdownItem(_title);
-            root.AddChild(new TypeDropdownItem(null, "None (Null)"));
-
-            int mode = EditorPrefs.GetInt("SubClassSelector_Mode", 0);
-            if (mode == 1) BuildNamespaceTree(root);
-            else if (mode == 2) BuildInheritanceTree(root);
-            else foreach (var t in _types.OrderBy(t => t.Name)) root.AddChild(new TypeDropdownItem(t));
-            
-            return root;
-        }
-
-        private void BuildNamespaceTree(AdvancedDropdownItem root)
-        {
-            foreach (var type in _types.OrderBy(t => t.FullName))
-            {
-                string ns = type.Namespace ?? "{Global}";
-                string[] parts = ns.Split('.');
-                AdvancedDropdownItem current = root;
-                foreach (var part in parts)
-                {
-                    var found = current.children.FirstOrDefault(c => c.name == part);
-                    if (found == null) { found = new AdvancedDropdownItem(part); current.AddChild(found); }
-                    current = found;
-                }
-                current.AddChild(new TypeDropdownItem(type));
-            }
-        }
-
-        private void BuildInheritanceTree(AdvancedDropdownItem root)
-        {
-            var nodes = new Dictionary<Type, AdvancedDropdownItem>();
-            foreach (var type in _types)
-            {
-                List<Type> hierarchy = new List<Type>();
-                Type curr = type;
-                while (curr != null && curr != typeof(object)) { hierarchy.Add(curr); curr = curr.BaseType; }
-                hierarchy.Reverse();
-                AdvancedDropdownItem parent = root;
-                foreach (var t in hierarchy)
-                {
-                    if (!nodes.TryGetValue(t, out var node)) { node = new TypeDropdownItem(t); parent.AddChild(node); nodes[t] = node; }
-                    parent = node;
-                }
-            }
-        }
-
-        protected override void ItemSelected(AdvancedDropdownItem item)
-        {
-            if (item is TypeDropdownItem typeItem) _onSelected?.Invoke(typeItem.Type);
-        }
-
-        private class TypeDropdownItem : AdvancedDropdownItem
-        {
-            public Type Type { get; }
-            public TypeDropdownItem(Type type, string name = null) : base(name ?? type.Name)
-            {
-                Type = type;
-                if (type != null) icon = (Texture2D)EditorGUIUtility.ObjectContent(null, type).image;
-            }
         }
     }
 }

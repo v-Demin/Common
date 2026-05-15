@@ -1,5 +1,8 @@
 using System;
 using UnityEngine;
 
-[AttributeUsage(AttributeTargets.Field)]
-public class SubClassSelectorAttribute : PropertyAttribute { }
+namespace Submodules.Common.Tools.SubclassSelector
+{
+    [AttributeUsage(AttributeTargets.Field)]
+    public class SubClassSelectorAttribute : PropertyAttribute { }
+}

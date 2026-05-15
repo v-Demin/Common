@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Submodules.Common.Tools.SubclassSelector;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Editor/Script Icon Rule Set")]
