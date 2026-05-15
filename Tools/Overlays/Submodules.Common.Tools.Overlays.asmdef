@@ -1,0 +1,16 @@
+{
+    "name": "Submodules.Common.Tools.Overlays",
+    "rootNamespace": "Submodules.Common.Tools.Overlays",
+    "references": [
+        "GUID:79c4732a45a0843439d09781113efe92"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

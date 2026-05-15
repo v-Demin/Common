@@ -1,0 +1,14 @@
+{
+    "name": "Submodules.Common.Tools.SubclassCreator",
+    "rootNamespace": "Submodules.Common.Tools.SubclassCreator",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

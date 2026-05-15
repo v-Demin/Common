@@ -1,0 +1,16 @@
+{
+    "name": "Submodules.Common.Utils",
+    "rootNamespace": "Submodules.Common.Utils",
+    "references": [
+        "GUID:3ff1a809d69a23541b0fcb30b412ac71"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,14 @@
+{
+    "name": "Submodules.Common.Tools.SubclassSelector",
+    "rootNamespace": "Submodules.Common.Tools.SubclassSelector",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
