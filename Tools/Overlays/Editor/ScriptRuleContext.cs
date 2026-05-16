@@ -1,16 +1,21 @@
 using System;
 using UnityEditor;
 
-public readonly struct ScriptRuleContext
+namespace Submodules.Common.Tools.Overlays
 {
-    public readonly string Path;
-    public readonly Type Type;
-    public readonly MonoScript Script;
-
-    public ScriptRuleContext(string path, MonoScript script, Type type)
+    public class ScriptRuleContext
     {
-        Path = path;
-        Script = script;
-        Type = type;
+        public string Path { get; }
+        public MonoScript Script { get; }
+        public Type Type { get; }
+        public string AssemblyName { get; }
+
+        public ScriptRuleContext(string path, MonoScript script, Type type, string assemblyName)
+        {
+            Path = path;
+            Script = script;
+            Type = type;
+            AssemblyName = assemblyName;
+        }
     }
 }
