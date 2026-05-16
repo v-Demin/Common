@@ -1,29 +1,21 @@
 using System;
-using UnityEditor;
-using UnityEngine;
 
-[Serializable]
-public class AbstractClassRule : ScriptIconRule
+namespace Submodules.Common.Tools.Overlays
 {
-    private static Texture2D _icon;
-
-    public override bool Matches(ScriptRuleContext ctx)
+    [Serializable]
+    public class AbstractClassRule : ScriptIconRule
     {
-        var t = ctx.Type;
-        return t is { IsAbstract: true, IsSealed: false };
-    }
+        private const string IconPath = "AbstractScriptIcon";
 
-    public override Texture2D Icon
-    {
-        get
+        public override bool Matches(ScriptRuleContext ctx)
         {
-            if (_icon != null) return _icon;
+            var t = ctx.Type;
+            return t is { IsAbstract: true, IsSealed: false };
+        }
 
-            _icon =
-                Resources.Load<Texture2D>("AbstractScriptIcon")
-                ?? (Texture2D)EditorGUIUtility.IconContent("console.warnicon").image;
-
-            return _icon;
+        public override ScriptIconElement GetElement(ScriptRuleContext ctx)
+        {
+            return new PathIconElement(IconPath);
         }
     }
 }

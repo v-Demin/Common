@@ -2,78 +2,98 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[InitializeOnLoad]
-public static class ScriptIconProjectWindowDrawer
+namespace Submodules.Common.Tools.Overlays
 {
-    private static ScriptIconRuleSet _ruleSet;
-    private static readonly Dictionary<string, List<Texture2D>> Cache = new();
-
-    static ScriptIconProjectWindowDrawer()
+    [InitializeOnLoad]
+    public static class ScriptIconProjectWindowDrawer
     {
-        EditorApplication.projectWindowItemOnGUI += OnGUI;
-        ScriptIconRuleSet.OnChanged += () => Cache.Clear();
-    }
+        private static ScriptIconRuleSet _ruleSet;
+        private static readonly Dictionary<string, List<ScriptIconElement>> Cache = new();
 
-    public static void SetRuleSet(ScriptIconRuleSet set)
-    {
-        _ruleSet = set;
-        Cache.Clear();
-    }
-
-    private static void OnGUI(string guid, Rect rect)
-    {
-        // Если статика слетела после компиляции — ищем ассет в проекте
-        if (_ruleSet == null)
+        static ScriptIconProjectWindowDrawer()
         {
-            var assets = AssetDatabase.FindAssets("t:ScriptIconRuleSet");
-            if (assets.Length > 0)
-            {
-                var path = AssetDatabase.GUIDToAssetPath(assets[0]);
-                _ruleSet = AssetDatabase.LoadAssetAtPath<ScriptIconRuleSet>(path);
-            }
-            if (_ruleSet == null) return;
+            EditorApplication.projectWindowItemOnGUI += OnGUI;
+            ScriptIconRuleSet.OnChanged += () => Cache.Clear();
         }
 
-        if (!Cache.TryGetValue(guid, out var icons))
+        public static void SetRuleSet(ScriptIconRuleSet set)
         {
-            var path = AssetDatabase.GUIDToAssetPath(guid);
-            // Работаем только с C# скриптами
-            if (!path.EndsWith(".cs")) return;
+            _ruleSet = set;
+            Cache.Clear();
+        }
 
-            var script = AssetDatabase.LoadAssetAtPath<MonoScript>(path);
-            if (script != null)
+        private static void OnGUI(string guid, Rect rect)
+        {
+            if (_ruleSet == null)
             {
-                var type = script.GetClass();
-                if (type != null)
+                var assets = AssetDatabase.FindAssets("t:ScriptIconRuleSet");
+                if (assets.Length > 0)
                 {
-                    var ctx = new ScriptRuleContext(path, script, type);
-                    icons = _ruleSet.GetIcons(ctx);
-                    Cache[guid] = icons;
+                    var path = AssetDatabase.GUIDToAssetPath(assets[0]);
+                    _ruleSet = AssetDatabase.LoadAssetAtPath<ScriptIconRuleSet>(path);
+                }
+
+                if (_ruleSet == null) return;
+            }
+
+            if (!Cache.TryGetValue(guid, out var elements))
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                if (!path.EndsWith(".cs")) return;
+
+                var script = AssetDatabase.LoadAssetAtPath<MonoScript>(path);
+                if (script != null)
+                {
+                    var type = script.GetClass();
+                    if (type != null)
+                    {
+                        var ctx = new ScriptRuleContext(path, script, type);
+                        elements = _ruleSet.GetElements(ctx);
+                        Cache[guid] = elements;
+                    }
                 }
             }
+
+            if (elements != null) Draw(rect, elements);
         }
 
-        if (icons != null) Draw(rect, icons);
-    }
-
-    private static void Draw(Rect rect, List<Texture2D> icons)
-    {
-        if (icons.Count == 0) return;
-
-        const float size = 14f;
-        const float spacing = 2f;
-        float x = rect.xMax - size;
-        float y = rect.yMax - size;
-
-        // Коррекция для режима списка (маленькие иконки)
-        if (rect.height < 20) y = rect.y;
-
-        for (int i = 0; i < icons.Count; i++)
+        private static void Draw(Rect rect, List<ScriptIconElement> elements)
         {
-            var icon = icons[i];
-            if (icon == null) continue;
-            GUI.DrawTexture(new Rect(x, y, size, size), icon);
-            x -= (size + spacing);
+            if (elements == null || elements.Count == 0) return;
+
+            const float spacing = 2f;
+            const float defaultHeight = 14f;
+
+            // Высчитываем общую ширину для правильного позиционирования слева-направо
+            float totalWidth = 0f;
+            for (int i = 0; i < elements.Count; i++)
+            {
+                totalWidth += elements[i].Width;
+                if (i < elements.Count - 1)
+                {
+                    totalWidth += spacing;
+                }
+            }
+
+            // Стартовая точка x (левый край блока иконок)
+            float x = rect.xMax - totalWidth;
+            float y = rect.yMax - defaultHeight;
+
+            if (rect.height < 20) y = rect.y;
+
+            for (int i = 0; i < elements.Count; i++)
+            {
+                var element = elements[i];
+                if (element == null) continue;
+
+                float width = element.Width;
+                Rect elementRect = new Rect(x, y, width, defaultHeight);
+
+                element.Draw(elementRect);
+
+                // Сдвигаемся вправо для следующего элемента
+                x += width + spacing;
+            }
         }
     }
 }

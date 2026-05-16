@@ -1,9 +1,11 @@
 using System;
-using UnityEngine;
 
-[Serializable]
-public abstract class ScriptIconRule
+namespace Submodules.Common.Tools.Overlays
 {
-    public abstract bool Matches(ScriptRuleContext ctx);
-    public abstract Texture2D Icon { get; }
+    [Serializable]
+    public abstract class ScriptIconRule
+    {
+        public abstract bool Matches(ScriptRuleContext ctx);
+        public abstract ScriptIconElement GetElement(ScriptRuleContext ctx);
+    }
 }

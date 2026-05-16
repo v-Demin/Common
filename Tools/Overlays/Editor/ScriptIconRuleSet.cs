@@ -3,39 +3,46 @@ using System.Collections.Generic;
 using Submodules.Common.Tools.SubclassSelector;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Editor/Script Icon Rule Set")]
-public class ScriptIconRuleSet : ScriptableObject
+namespace Submodules.Common.Tools.Overlays
 {
-    public static event Action OnChanged;
-    [SerializeReference] [SubClassSelector] public List<ScriptIconRule> Rules = new();
-
-
-    private void OnEnable()
+    [CreateAssetMenu(menuName = "Editor/Script Icon Rule Set")]
+    public class ScriptIconRuleSet : ScriptableObject
     {
-        ScriptIconProjectWindowDrawer.SetRuleSet(this);
-    }
+        public static event Action OnChanged;
+        [SerializeReference] [SubClassSelector] public List<ScriptIconRule> Rules = new();
 
-    private void OnValidate()
-    {
-        OnChanged?.Invoke();
-        ScriptIconProjectWindowDrawer.SetRuleSet(this);
-    }
-
-    public List<Texture2D> GetIcons(ScriptRuleContext ctx)
-    {
-        if (Rules == null) return null;
-        List<Texture2D> result = null;
-
-        for (int i = 0; i < Rules.Count; i++)
+        private void OnEnable()
         {
-            var rule = Rules[i];
-            if (rule == null) continue;
-            if (!rule.Matches(ctx)) continue;
-
-            result ??= new List<Texture2D>();
-            result.Add(rule.Icon);
+            ScriptIconProjectWindowDrawer.SetRuleSet(this);
         }
 
-        return result;
+        private void OnValidate()
+        {
+            OnChanged?.Invoke();
+            ScriptIconProjectWindowDrawer.SetRuleSet(this);
+        }
+
+        public List<ScriptIconElement> GetElements(ScriptRuleContext ctx)
+        {
+            if (Rules == null) return null;
+            List<ScriptIconElement> result = null;
+
+            for (int i = 0; i < Rules.Count; i++)
+            {
+                var rule = Rules[i];
+                if (rule == null) continue;
+                if (!rule.Matches(ctx)) continue;
+
+                result ??= new List<ScriptIconElement>();
+                var element = rule.GetElement(ctx);
+                if (element != null)
+                {
+                    result.Add(element);
+                }
+            }
+
+            return result;
+        }
     }
 }
+
