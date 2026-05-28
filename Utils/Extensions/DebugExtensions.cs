@@ -4,7 +4,6 @@ namespace Submodules.Common.Utils
 {
     public static partial class DebugExtensions
     {
-
         public static void LogBool(this string message)
         {
             message.LogBool(message.Contains("True"));
